@@ -54,8 +54,14 @@ A test repo for demonstrating the very basic capabilities of the enterprise-mcp 
     python main.py
     ```
 2. **Access the API documentation:**
-Open your browser and navigate to http://127.0.0.1:8000/docs to view the interactive API documentation.
+Open your browser and navigate to either
+    1. http://127.0.0.1:8000/docs
+    or
+    1. http://127.0.0.1:8000/redoc
 
+    to view the interactive API documentation.
+
+    
 ## Docker usage
 1. **Build the docker image:**
     ```sh
