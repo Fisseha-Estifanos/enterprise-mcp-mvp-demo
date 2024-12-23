@@ -1,0 +1,14 @@
+{
+    "max_question_length": 1000,
+    "allowed_roles": [
+        "admin",
+        "editor",
+        "viewer"
+    ],
+    "SQLALCHEMY_DATABASE_URL": "sqlite:///../rbac.db",
+    "llm_model": "gpt-3.5-turbo",
+    "categorize_question_prompt": "Classify this question into one of three groups: `Weather`, `Filesystem`, or `Unknown`. Question: {question}. You will only return the classification and nothing else. This is your return type. Example1. `Weather`, or Example2. `Filesystem`",
+    "weather_server_path": "mcp_servers/weather/server.py",
+    "filesystem_server_path": "mcp_servers/filesystem/dist/index.js",
+    "allowed_directories": "/Users/admin/Documents/Jacques/"
+}

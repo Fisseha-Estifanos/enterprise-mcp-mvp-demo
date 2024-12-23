@@ -1,0 +1,4 @@
+{
+    "filesystem_ts": "back-end/mcp-servers/filesystem/dist/index.js",
+    "weather_initial_python": "back-end/mcp-servers/weather/server.py"
+}
