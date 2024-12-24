@@ -170,3 +170,4 @@ enterprise_mcp_mvp_demo/db/populate_table.py
 enterprise_mcp_mvp_demo/db/v2/*
 enterprise_mcp_mvp_demo/db/database.py
 .DS_Store
+enterprise_mcp_mvp_demo/playground/
