@@ -11,10 +11,10 @@ from pydantic import BaseModel
 
 from fastapi import APIRouter, HTTPException
 
-from db.db_manager import DatabaseManager
+from playground.rbac_claude.manager import Manager
 
 server_router = APIRouter(prefix="/servers", tags=["servers"])
-crud = DatabaseManager()
+manager = Manager()
 
 
 # Pydantic models for request/response
@@ -27,7 +27,6 @@ class ServerCreate(BaseModel):
     """
 
     name: str
-    required_role: int
 
 
 class ServerResponse(BaseModel):
@@ -40,7 +39,6 @@ class ServerResponse(BaseModel):
 
     id: int
     name: str
-    required_role: int
 
     class Config:
         orm_mode = True
@@ -72,7 +70,7 @@ def create_server(server: ServerCreate):
         Server: The created server.
     """
     try:
-        return crud.create_server(name=server.name, required_role=server.required_role)
+        return manager.create_domain(domain_name=server.name)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -91,7 +89,7 @@ def get_server(server_id: int):
     Returns:
         Server: The server.
     """
-    server = crud.get_server(server_id)
+    server = manager.get_server(server_id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     return server
@@ -105,7 +103,7 @@ def get_all_servers():
     Returns:
         List[Server]: The list of all servers.
     """
-    return crud.get_all_servers()
+    return manager.get_domains()
 
 
 @server_router.put("/{server_id}/role", response_model=ServerResponse)
@@ -123,7 +121,7 @@ def update_server_role(server_id: int, role_update: ServerRoleUpdate):
     Returns:
         Server: The updated server.
     """
-    server = crud.update_server_role(server_id, role_update.required_role)
+    server = manager.update_server_role(server_id, role_update.required_role)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
     return server
@@ -143,6 +141,6 @@ def delete_server(server_id: int):
     Returns:
         dict: The deletion message.
     """
-    if not crud.delete_server(server_id):
+    if not manager.delete_server(server_id):
         raise HTTPException(status_code=404, detail="Server not found")
     return {"message": "Server deleted successfully"}

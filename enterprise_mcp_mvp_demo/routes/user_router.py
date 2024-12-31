@@ -8,13 +8,15 @@ Raises:
 
 from typing import List
 from pydantic import BaseModel
+from datetime import datetime
+
 
 from fastapi import APIRouter, HTTPException
 
-from db.db_manager import DatabaseManager
+from playground.rbac_claude.manager import Manager
 
 user_router = APIRouter(prefix="/users", tags=["users"])
-crud = DatabaseManager()
+manager = Manager()
 
 
 # Pydantic models for request/response
@@ -27,7 +29,8 @@ class UserCreate(BaseModel):
     """
 
     username: str
-    role: int
+    email: str
+    password: str
 
 
 class UserResponse(BaseModel):
@@ -40,7 +43,11 @@ class UserResponse(BaseModel):
 
     id: int
     username: str
-    role: int
+    email: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+    # role: int ???
 
     class Config:
         orm_mode = True
@@ -72,7 +79,7 @@ def create_user(user: UserCreate):
         User: The created user.
     """
     try:
-        return crud.create_user(username=user.username, role=user.role)
+        return manager.create_user(user=user)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -91,7 +98,7 @@ def get_user(user_id: int):
     Returns:
         User: The user, or an HTTPException if the user could not be found.
     """
-    user = crud.get_user(user_id)
+    user = manager.get_user(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -105,7 +112,7 @@ def get_all_users():
     Returns:
         List[User]: The list of all users.
     """
-    return crud.get_all_users()
+    return manager.get_users()
 
 
 @user_router.put("/{user_id}/role", response_model=UserResponse)
@@ -123,7 +130,7 @@ def update_user_role(user_id: int, role_update: UserRoleUpdate):
     Returns:
         User: The updated user.
     """
-    user = crud.update_user_role(user_id, role_update.role)
+    user = manager.update_user_role(user_id, role_update.role)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -143,7 +150,7 @@ def delete_user(user_id: int):
     Returns:
         dict: The deletion message.
     """
-    if not crud.delete_user(user_id):
+    if not manager.delete_user(user_id):
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
 
@@ -160,4 +167,4 @@ def check_server_access(user_id: int, server_id: int):
     Returns:
         dict: The result of the access check.
     """
-    return {"can_access": crud.can_access_server(user_id, server_id)}
+    return {"can_access": manager.can_access_server(user_id, server_id)}

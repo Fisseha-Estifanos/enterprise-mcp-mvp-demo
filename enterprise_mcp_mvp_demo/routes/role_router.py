@@ -12,10 +12,10 @@ from pydantic import BaseModel
 
 from fastapi import APIRouter, HTTPException
 
-from db.db_manager import DatabaseManager
+from playground.rbac_claude.manager import Manager
 
 role_router = APIRouter(prefix="/roles", tags=["roles"])
-crud = DatabaseManager()
+manager = Manager()
 
 
 # Pydantic models for request/response
@@ -27,8 +27,7 @@ class RoleCreate(BaseModel):
         BaseModel (): The base Pydantic model class.
     """
 
-    role_name: str
-    level: int
+    name: str
 
 
 class RoleResponse(BaseModel):
@@ -40,8 +39,7 @@ class RoleResponse(BaseModel):
     """
 
     id: int
-    role_name: str
-    level: int
+    name: str
 
     class Config:
         orm_mode = True
@@ -62,7 +60,7 @@ def create_role(role: RoleCreate):
         RoleHierarchy: The created role.
     """
     try:
-        return crud.create_role(role_name=role.role_name, level=role.level)
+        return manager.create_role(role_name=role.name)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -81,7 +79,7 @@ def get_role(role_id: int):
     Returns:
         RoleHierarchy: The role.
     """
-    role = crud.get_role(role_id)
+    role = manager.get_role(role_id)
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     return role
@@ -101,7 +99,7 @@ def get_role_by_name(role_name: str):
     Returns:
         RoleHierarchy: The role.
     """
-    role = crud.get_role_by_name(role_name)
+    role = manager.get_role_by_name(role_name)
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     return role
@@ -115,4 +113,4 @@ def get_all_roles():
     Returns:
         List[RoleHierarchy]: The list of all roles.
     """
-    return crud.get_all_roles()
+    return manager.get_roles()
